@@ -37,6 +37,14 @@ type states_t enum {
 // RunFSM runs elevator and updates variables in stateMachineChannels
 
 func RunFSM(ch StateMachineChannels){
+	elevator := Elev{
+		State: IDLE, 
+		Dir: DIRN_STOP,
+		Floor: hardware.elev_get_floor_sensor_signal()
+		Queue: [N_FLOOR][N_BUTTONS]bool{},
+	}
+	// Need a timer to check if order is completed
+	
 	update_queue();
 	curr_floor = elev_get_floor_sensor_signal(); //gjør om til en variabel, øker lesbarhet
 	// sett lys etter hvilken etasje heisen er i

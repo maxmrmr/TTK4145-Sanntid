@@ -13,14 +13,14 @@ import (
 
 const MOTOR_SPEED = 2800
 
-var lamp_channel_matrix = [NumFloors][NumButtons]int{
+var lamp_channel_matrix = [N_FLOORS][N_BUTTONS]int{
 	{LIGHT_UP1, LIGHT_DOWN1, LIGHT_COMMAND1},
 	{LIGHT_UP2, LIGHT_DOWN2, LIGHT_COMMAND2},
 	{LIGHT_UP3, LIGHT_DOWN3, LIGHT_COMMAND3},
 	{LIGHT_UP4, LIGHT_DOWN4, LIGHT_COMMAND4},
 }
 
-var button_channel_matrix = [NumFloors][NumButtons]int{
+var button_channel_matrix = [N_FLOORS][N_BUTTONS]int{
 	{BUTTON_UP1, BUTTON_DOWN1, BUTTON_COMMAND1},
 	{BUTTON_UP2, BUTTON_DOWN2, BUTTON_COMMAND2},
 	{BUTTON_UP3, BUTTON_DOWN3, BUTTON_COMMAND3},
@@ -61,17 +61,17 @@ func Init(e Elev_type, btnsPressed chan Keypress, ArrivedAtFloor chan int, simPo
 	}
 
 	if GetFloorSensorSignal() == -1 {
-		SetMotorDirection(DirDown)
+		SetMotorDirection(DIRN_DOWN)
 	}
 	for {
 		if GetFloorSensorSignal() != -1 {
-			SetMotorDirection(DirStop)
+			SetMotorDirection(DIRN_STOP)
 			break
 		}
 	}
 
-	for f := 0; f < NumFloors; f++ {
-		for b := 0; b < NumButtons; b++ {
+	for f := 0; f < N_FLOORS; f++ {
+		for b := 0; b < N_BUTTONS; b++ {
 			SetButtonLamp(Button(b), f, 0)
 		}
 	}
@@ -250,11 +250,11 @@ func getObstructionSignal() int {
 
 func ButtonPoller(btnsPressedCh chan Keypress) {
 	var btnPress Keypress
-	var btnsPressedMatrix [NumButtons][NumFloors]int
+	var btnsPressedMatrix [N_BUTTONS][N_FLOORS]int
 	for {
 		time.Sleep(time.Millisecond * 20)
-		for floor := 0; floor < NumFloors; floor++ {
-			for btn := BtnUp; btn < NumButtons; btn++ {
+		for floor := 0; floor < N_FLOORS; floor++ {
+			for btn := BtnUp; btn < N_BUTTONS; btn++ {
 				v := getButtonSignal(btn, floor)
 				if v == 1 && btnsPressedMatrix[btn][floor] != 1 {
 					btnPress.Btn = btn
