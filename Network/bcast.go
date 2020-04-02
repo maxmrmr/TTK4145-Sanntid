@@ -67,13 +67,9 @@ func Receiver(port int, chans ...interface{}) {
 	}
 }
 
-// Checks that args to Tx'er/Rx'er are valid:
-//  All args must be channels
+// Checks if the arguments to transmit and receive are valid channels: 
 //  Element types of channels must be encodable with JSON
 //  No element types are repeated
-// Implementation note:
-//  - Why there is no `isMarshalable()` function in encoding/json is a mystery,
-//    so the tests on element type are hand-copied from `encoding/json/encode.go`
 func checkArgs(chans ...interface{}) {
 	n := 0
 	for range chans {
