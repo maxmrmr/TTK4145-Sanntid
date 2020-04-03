@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
-	"./network/bcast"
-	"./network/localip"
-	"./network/peers"
+	"./bcast"
+	"./localip"
+	"./peers"
 )
 
 // Defining sone struct to send over the network
@@ -21,6 +21,7 @@ type HelloMsg struct {
 }
 
 func main() {
+	fmt.Println("\nHello world!\n")
 	//
 	var id string
 	flag.StringVar(&id, "id", "", "id of this peer")
