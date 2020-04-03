@@ -11,6 +11,9 @@ import (
 	"./bcast"
 	"./localip"
 	"./peers"
+	//"https://github.com/maxmrmr/TTK4145-Sanntid/Network/bcast"
+	//"https://github.com/maxmrmr/TTK4145-Sanntid/Network/localip"
+	//"https://github.com/maxmrmr/TTK4145-Sanntid/Network/peers"
 )
 
 // Defining sone struct to send over the network

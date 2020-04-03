@@ -1,12 +1,15 @@
 package bcast
 
 import (
-	"../conn"
 	"encoding/json"
 	"fmt"
 	"net"
 	"reflect"
 	"strings"
+
+	"../conn"
+	
+	//"https://github.com/maxmrmr/TTK4145-Sanntid/Network/conn"
 )
 
 // Encodes received values from `chans` into type-tagged JSON, then broadcasts
@@ -67,7 +70,7 @@ func Receiver(port int, chans ...interface{}) {
 	}
 }
 
-// Checks if the arguments to transmit and receive are valid channels: 
+// Checks if the arguments to transmit and receive are valid channels:
 //  Element types of channels must be encodable with JSON
 //  No element types are repeated
 func checkArgs(chans ...interface{}) {
