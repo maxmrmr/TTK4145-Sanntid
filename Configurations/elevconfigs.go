@@ -38,3 +38,15 @@ type Elev struct {
 	Floor int
 	Done bool
 }
+
+type Keypress struct {
+	Button int
+	Floor int
+}
+
+const (
+	Connected int = iota + 1
+	NewOrder
+	CompleteOrder
+	Cost
+)

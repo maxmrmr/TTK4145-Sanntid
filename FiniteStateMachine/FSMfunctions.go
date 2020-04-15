@@ -1,6 +1,6 @@
 package FiniteStateMachine
 import "fmt"
-import . "https://github.com/maxmrmr/TTK4145-Sanntid/blob/master/Configurations"
+import ."https://github.com/maxmrmr/TTK4145-Sanntid/tree/master/Configurations"
 
 //FIXME: lag Elev variabel med curr_floor, queue[floor][button], floor, dir
 
