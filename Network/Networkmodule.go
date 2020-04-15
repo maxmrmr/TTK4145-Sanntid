@@ -24,7 +24,7 @@ type HelloMsg struct {
 }
 
 func main() {
-	fmt.Println("\nHello world!\n")
+	fmt.Println("Hello world!")
 	//
 	var id string
 	flag.StringVar(&id, "id", "", "id of this peer")
