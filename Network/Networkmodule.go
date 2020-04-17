@@ -17,7 +17,7 @@ import (
 )
 
 // Defining sone struct to send over the network
-// All members we want to transmit must be public. Any private members will be receives as zero-values
+// All members we want to transmit must be public. Any private members will be received as zero-values
 type HelloMsg struct {
 	Message string
 	Iter    int
@@ -42,7 +42,7 @@ func main() {
 	//Make a channel to receive updates on the id's of the peers that are "alive" on the network
 	peerUpdateCh := make(chan peers.PeerUpdate)
 
-	//The transmitter can be disabled/enabled after it has been started
+	//Writes id to port 15647 and
 	peerTxEnable := make(chan bool)
 	go peers.Transmitter(15647, id, peerTxEnable) //FIXME sjekk tall
 	go peers.Receiver(15647, peerUpdateCh)
