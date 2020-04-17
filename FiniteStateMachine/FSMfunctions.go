@@ -5,7 +5,7 @@ import ."https://github.com/maxmrmr/TTK4145-Sanntid/tree/master/Configurations"
 //FIXME: lag Elev variabel med curr_floor, queue[floor][button], floor, dir
 
 
-static int queue[N_FLOORS][N_BUTTONS] = {{0}}
+
 
 func queue_order_below(elevator Elev) bool{
 	for (floor := 0; floor < elevator.curr_floor; floor ++){
