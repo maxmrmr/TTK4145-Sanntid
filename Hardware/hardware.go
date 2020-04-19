@@ -8,8 +8,6 @@ import (
 	"time"
 
 	"../Configurations"
-
-	//"https://github.com/maxmrmr/TTK4145-Sanntid.git"
 )
 
 

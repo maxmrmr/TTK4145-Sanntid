@@ -8,8 +8,6 @@ import (
 	"strings"
 
 	"../conn"
-	
-	//"https://github.com/maxmrmr/TTK4145-Sanntid/Network/conn"
 )
 
 // Encodes received values from `chans` into type-tagged JSON, then broadcasts

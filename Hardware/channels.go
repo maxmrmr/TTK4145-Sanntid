@@ -1,4 +1,4 @@
-package hardware
+package Hardware
 
 // In port 4
 const (

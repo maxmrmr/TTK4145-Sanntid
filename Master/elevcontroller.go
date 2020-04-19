@@ -4,9 +4,7 @@ import (
 	"fmt"
 
 	"../Hardware"
-	
-	//. "github.com/maxmrmr/TTK4145-Sanntid/blob/master/Configurations"
-	//com/maxmrmr/TTK4145-Sanntid/blob/master/Hardware"
+	"../Configurations"
 )
 
 func costCalculator(order buttonPressed, elevatorList[N_ELEVS], thisElevator int, onlineElevators [N_ELEVS]bool) int {

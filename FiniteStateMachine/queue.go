@@ -1,11 +1,11 @@
 package queue
 
-
 import (
-	def "Configurations"
 	"fmt"
 	"log"
 	"time"
+
+	"../Configurations"
 )
 
 
