@@ -7,7 +7,9 @@ import (
 	"sync"
 	"time"
 
-	"https://github.com/maxmrmr/TTK4145-Sanntid.git"
+	"../Configurations"
+
+	//"https://github.com/maxmrmr/TTK4145-Sanntid.git"
 )
 
 

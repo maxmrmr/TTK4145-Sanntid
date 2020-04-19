@@ -2,8 +2,11 @@ package ElevController
 
 import (
 	"fmt"
-	. "github.com/maxmrmr/TTK4145-Sanntid/blob/master/Configurations"
-	hw "https://github.com/maxmrmr/TTK4145-Sanntid/blob/master/Hardware"
+
+	"../Hardware"
+	
+	//. "github.com/maxmrmr/TTK4145-Sanntid/blob/master/Configurations"
+	//com/maxmrmr/TTK4145-Sanntid/blob/master/Hardware"
 )
 
 func costCalculator(order buttonPressed, elevatorList[N_ELEVS], thisElevator int, onlineElevators [N_ELEVS]bool) int {
