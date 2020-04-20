@@ -52,8 +52,8 @@ func main() {
 	helloRx := make(chan HelloMsg)
 
 	//Sender og lytter til meldinger på Aurora sin favorittkanal
-	go bcast.Transmitter(33333, helloTx)
-	go bcast.Receiver(33333, helloRx)
+	go bcast.Transmitter(20123, helloTx)
+	go bcast.Receiver(20123, helloRx)
 
 	go func() {
 		helloMsg := HelloMsg{"Hello from " + id, 0}
@@ -65,16 +65,22 @@ func main() {
 	}()
 
 	fmt.Println("Started")
-	for {
-		select {
-		case p := <-peerUpdateCh:
-			fmt.Printf("Peer update:\n")
-			fmt.Printf("  Peers:    %q\n", p.Peers)
-			fmt.Printf("  New:      %q\n", p.New)
-			fmt.Printf("  Lost:     %q\n", p.Lost)
+	go func() {
+		for {
+			fmt.Println("Started again")
+			select {
+			case p := <-peerUpdateCh:
+				fmt.Printf("Peer update:\n")
+				fmt.Printf("  Peers:    %q\n", p.Peers)
+				fmt.Printf("  New:      %q\n", p.New)
+				fmt.Printf("  Lost:     %q\n", p.Lost)
 
-		case a := <-helloRx:
-			fmt.Printf("Received: %#v\n", a)
+			case a := <-helloRx:
+				fmt.Printf("Received: %#v\n", a)
+			}
 		}
-	}
+	}()
+
+	fmt.Println("OKOK")
+	select {}
 }
