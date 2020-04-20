@@ -46,7 +46,12 @@ type Elev struct {
 type Keypress struct {
 	Button elevio.ButtonType
 	Floor int
-	DesignatedElev int
+	DesignatedElevator int
+}
+
+type Message struct {
+	Elevator [N_ELEVS]Elev
+	This int
 }
 
 const (
