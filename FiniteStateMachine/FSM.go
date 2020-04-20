@@ -2,144 +2,181 @@ package FiniteStateMachine
 
 import (
 	"fmt"
-	"time"
-
-	"../Configurations"
-	"../Hardware"
+	t "time"
+	con "../Configurations"
+	elevio "../Hardware"
 )
 
-int curr_floor;
-int prev_floor;
-int dir;
-elev_button_type_t button;
 
-states_t state = INIT;
 
 // StateMachineChannels contains the channels between the elevators
 type StateMachineChannels struct {
 	OrderCompleted  chan int
-	Elecator 		chan Elev
-	StateError 		chan error
-	NewOrder        chan Keypress
+	Elevator 		chan con.Elev
+	NewOrder 		chan elevio.ButtonEvent
 	ArrivedAtFloor  chan int
+	DeleteQueue     chan [con.N_FLOORS][con.N_BUTTONS]bool
 }
 
-type states_t enum {
-	INIT,
-	IDLE,
-	RUN, 
-	STOPPER,
-	DOOROPEN
-}
+
 
 // RunFSM runs elevator and updates variables in stateMachineChannels
 
-func RunFSM(ch StateMachineChannels){
-	elevator := Elev{
-		State: IDLE, 
-		Dir: DIRN_STOP,
-		Floor: hardware.elev_get_floor_sensor_signal()
-		Queue: [N_FLOOR][N_BUTTONS]bool{},
+func RunFSM(ch StateMachineChannels, thisElevator  int){
+	elevator := con.Elev{
+		State: con.IDLE, 
+		Dir: elevio.MD_Stop,
+		Floor: elevio.getFloor(),
 	}
-	// Need a timer to check if order is completed
 	
-	update_queue();
-	curr_floor = elev_get_floor_sensor_signal(); //gjør om til en variabel, øker lesbarhet
+	// Need a timer to check if order is completed
+	timer_DoorOpen := t.NewTimer(3 * t.Second)
+	timer_ElevatorLost := t.NewTimer(3 * t.Second)
+
+	timer_DoorOpen.Stop()
+	timer_ElevatorLost.Stop()
+	updateExternal := false
+
+	//update_queue();
+	//curr_floor = elev_get_floor_sensor_signal(); //gjør om til en variabel, øker lesbarhet
 	// sett lys etter hvilken etasje heisen er i
-	if (curr_floor ! = -1){
-		prev_floor = curr_floor;
-		elev_set_floor_indicator(curr_floor);
+	if (elevio.getFloor() == -1) {
+		elevio.SetMotorDirection(elevio.MD_Down)
 	}
+	elevio.SetMotorDirection(elevio.MD_Stop)
+	//readFromFile("elevOrders", thisElevator, &elevator)
+
 
 	//stopper og gjelder uansett
-	if(elev_get_stop_signal() == 1) {
-		state = STOPPER;
-	  }
-	
-		switch (state){
-	
-		  case INIT:
-			elev_set_motor_direction(DIRN_UP);
-			dir = 1;
-	
-			if(curr_floor != -1){
-				elev_set_motor_direction(DIRN_STOP);
-				state = IDLE;
-				break;
-			}
-	
-			break;
-	
-		  case IDLE:
-			if (check_queue_empty() == 0){
-			  state = RUN;
-			  break;
-			}
-			break;
-	
-		  case RUN:
-			//sjekker etasjene heisen passerer
-			if(elev_get_floor_sensor_signal() != -1){
-			  if (queue_elev_run_stop(curr_floor, dir) == 1) { //potensiell test
-							remove_floor_from_queue(curr_floor);
-							  remove_light(curr_floor);
-				state = DOOROPEN;
-				start_timer();
-				break;
-			  }
-						if (state!=DOOROPEN){
-							dir = set_queue_dir(curr_floor,dir);
-			}
+	if ( elevio.getStop() == 1) { //ville ikke fungere med elevio...
+		elevator.State = con.STOPPER;
+	}
+	for {
+		select {
+		case newOrder := <- ch.NewOrder:
+			elevator.Queue[newOrder.Floor][newOrder.Button] = true
+			switch (elevator.State) {
+			case con.Undefined:
+				fmt.Println("Error, elevator state for elevator running is undefines in fsm.go function\n")
+				updateExternal = true
+				break
+			case con.IDLE:
+				elevator.Dir = set_queue_dir(elevator)
+				elevio.SetMotorDirection(elevator.Dir)
+				if elevator.Dir == elevio.MD_Stop {
+					elevator.State = con.DOOROPEN
+					elevio.SetDoorOpenLamp(true)
+					timer_DoorOpen.Reset(3* t.Second)
+					elevator.Queue[elevator.Floor] = [con.N_BUTTONS]bool{false} //removing order from queue
+				} else {
+					elevator.State = con.RUN
+					timer_ElevatorLost.Reset( 3* t.Second)
 				}
-			break;
+				updateExternal = true
+
 	
-		  case STOPPER:
-			//queue cleares, heisen stopper
-			elev_set_stop_lamp(1);
-			//int dirn = elev_get_motor_directcheck_queue_empty()==0){ion(); //setter dir til den retningen vi kjørte i før stop ble trykekt
-			elev_set_motor_direction(DIRN_STOP);
-			remove_all_queue();
+			case con.RUN:
+				updateExternal = true
+	
+		  	case con.STOPPER:
+				//queue cleares, heisen stopper
+				elevio.SetStopLamp(true)
+				//int dirn = elev_get_motor_directcheck_queue_empty()==0){ion(); //setter dir til den retningen vi kjørte i før stop ble trykekt
+				elevio.SetMotorDirection(elevio.MD_Stop)
+				remove_all_queue(elevator)
 	
 	
-			if ((elev_get_floor_sensor_signal()!= -1 ) && elev_get_stop_signal()){
-			  while ((elev_get_floor_sensor_signal()!= -1 ) && elev_get_stop_signal()){
-				elev_set_door_open_lamp(1);
-			  }
-			  state = DOOROPEN;
-			  elev_set_stop_lamp(0);
-			  break;
-			  }
+				if ((elevio.getFloor() !=-1) && elevio.getStop()) {
+			  		for ((elevio.getFloor() != -1 ) && elevio.getStop()) {
+						elevio.SetDoorOpenLamp(1)
+			  		}
+			  	elevator.State = con.DOOROPEN
+			  	elevio.SetStopLamp(0)
+			  	break
+			  	}
 	
-			if (!elev_get_stop_signal()){
-				elev_set_stop_lamp(0);
-				state=INIT;
-				break;
-				if(elev_get_floor_sensor_signal()==-1){
-				  elev_set_motor_direction(dir); //fortsetter å kjøre i samme retning som før stopp
+				if (!elevio.GetStop()){
+					elevio.SetStopLamp(0)
+					elevator.state=con.Undefined
+					break;
+					if (elevio.GetFloor()==-1){
+				  		elevio.SetMotorDirection(elevator.Dir) //fortsetter å kjøre i samme retning som før stopp
+					}
+					elevator.state = con.DOOROPEN
+				 	break
+			  	}	
+				break
+	
+		  	case con.DOOROPEN: //door open
+	
+				elevio.SetMotorDirection(elevio.MD_Stop)
+				elevio.SetDoorOpenLamp(1)
+				if elevator.Floor == newOrder.Floor {
+					timer_DoorOpen.Reset(3 * t.Second)
+					elevator.Queue[elevator.Floor] = [con.N_BUTTONS]bool{false}	
+				} else {
+					updateExternal = true
 				}
-				state = DOOROPEN;
-				 break;
-			  }
-	
-	
-			break;
-	
-		  case DOOROPEN: //door open
-	
-			elev_set_motor_direction(DIRN_STOP);
-	
-			elev_set_door_open_lamp(1);
-			if(check_timer()){
-			  elev_set_door_open_lamp(0);
-			  if (!check_queue_empty()){
-				state = RUN;
-				break;
-			  } else
-				state = IDLE;
-				break;
-			  }
+				
 			}
+		case DeleteQueue := <-ch.DeleteQueue:
+			elevator.Queue = DeleteQueue
+		case elevator.Floor = <- ch.ArrivedAtFloor:
+			elevio.SetFloorIndicator(elevator.Floor)
+			if queue_elev_run_stop(elevator) {
+				timer_ElevatorLost.Stop()
+				elevio.SetMotorDirection(elevio.MD_Stop)
+				if !orderAtFloor(elevator) {
+					elevator.State = con.IDLE
+					timer_DoorOpen.Reset(3 * t.Second)
+				} else {
+					elevio.SetDoorOpenLamp(true)
+					elevator.State = con.DOOROPEN
+					DoorTimer.Reset(3 * t.Second)
+					elevator.Queue[elevator.Floor] = [con.N_BUTTONS]bool{false}
+				}
+			} else if elevator.State == con.RUN {
+				timer_ElevatorLost.Reset(3*t.Second)
+			}
+			updateExternal = true
+		case <- timer_DoorOpen.C: //if dooropen is timed out, order is done
+			elevio.SetDoorOpenLamp(false)
+			elevator.Dir = set_queue_dir(elevator)
+			if elevator.Dir == elevio.MD_Stop {
+				elevator.State = con.IDLE
+				timer_ElevatorLost.Stop()
+			} else {
+				elevator.State = con.RUN
+				timer_ElevatorLost.Reset(3*t.Second)
+				elevio.SetMotorDirection(elevator.Dir)
+			}
+			updateExternal = true
+		case <- timer_ElevatorLost.C:
+			elevator.State = con.Undefined
+			fmt.Println("Elevator connection is lost")
+			timer_ElevatorLost.Reset(5 * t.Second)
+			updateExternal = true
+		 }
+		 if updateExternal {
+			 updateExternal = false
+			 go func() {ch.Elevator <- elevator }()
+		}
+	}
 }
+
+	
+func UpdateKeysPressed(NewOrder chan con.Keypress, receiveOrder chan elevio.ButtonEvent) {
+	var key config.Keypress
+	key.DesignatedElevator = 1
+	for {
+		select {
+		case order := <-receiveOrder:
+			key.Floor = order.Floor
+			key.Button = order.Button
+			NewOrder <- key
+		}
+	}
+}		  
 
 
 

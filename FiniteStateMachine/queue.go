@@ -1,97 +1,122 @@
 package FiniteStateMachine
-import (
-	"fmt"
 
+import ( 
 	con "../Configurations"
-	"../elevio"
+	elevio"../Hardware"
 ) 
 
-//FIXME: lag Elev variabel med curr_floor, queue[floor][button], floor, dir
 
 
-
-
-func queue_order_below(elevator con.Elev) bool{
-	for (floor := 0; floor < elevator.curr_floor; floor ++){
-	  for (button := 0; button<=BUTTON_COMMAND; button++){
-		if(elevator.queue[floor][button] == 1){
-		  return true; 
-			  }  
+func queue_order_below(elevator con.Elev) bool {
+	for floor := 0; floor < elevator.Floor; floor ++ {
+	  	for button := elevio.BT_HallUp; button<=elevio.BT_Cab; button++ {
+			if(elevator.Queue[floor][button] == 1){
+		  		return true; 
+			}  
 	  }  
-	}
-	  return false; 
-}
-
-func queue_order_above(elevator con.Elev) bool{
-	for (floor := elevator.Floor; floor < con.N_FLOORS; floor ++){
-	  for (button := elevio.BT_HallUp; button<=elevio.BT_Cab; button++){
-		if(elevator.Queue[floor][button] == 1){
-		  return true;
-			  }
-	  }
 	}
 	return false; 
 }
 
-func set_queue_dir(elevator con.Elev) Direction{
-    // burde ikke trengs, men ok
-	if (floor==-1 && check_queue_empty()==0){
-		return DIRN_STOP;
+func queue_order_above(elevator con.Elev) bool{
+	for floor := elevator.Floor; floor < con.N_FLOORS; floor ++ {
+	  	for button := elevio.BT_HallUp; button<=elevio.BT_Cab; button++ {
+			if(elevator.Queue[floor][button] == 1){
+		  		return true;
+			}
+	  	}
 	}
-    // burde ikke trengs, men ok
-	if(elevator.dir == 0){
-	  elev_set_motor_direction(DIRN_UP); // opp
-	  return DIRN_UP;
-	} else if(elevator.floor == N_FLOORS-1){
-	  elev_set_motor_direction(DIRN_DOWN); // down
-	  return DIRN_DOWN;
-	}
-
-	if (elevator.dir == DIRN_UP){
-		if (queue_order_above(elevator.floor)){
-      elev_set_motor_direction(DIRN_UP);
-      return DIRN_UP;
-    } else if (queue_order_belove(floor)){
-      elev_set_motor_direction(DIRN_DOWN);
-      return DIRN_DOWN;
-    }
-  }
-	if (elevator.dir==DIRN_DOWN){
-    if (queue_order_belove(elevator.floor)){
-      elev_set_motor_direction(DIRN_DOWN);
-      return DIRN_DOWN;
-    } else if (queue_order_above(elevator.floor)){
-      elev_set_motor_direction(DIRN_UP);
-      return DIRN_UP;
-    }
-	}
-  if (elevator.dir==DIRN_STOP){
-    if (queue_order_above(elevator.floor)){
-      return DIRN_UP;
-    } else if (queue_order_belove(elevator.floor)){
-      return DIRN_DOWN;
-    }
-  }
-  return DIRN_STOP;
+	return false; 
 }
 
-func queue_elev_run_stop(elevator Elev) int{
-	if (elevator.dir==DIRN_DOWN){
-	  if (elevator.queue[elevator.floor][BUTTON_CALL_DOWN] == 1 || elevator.queue[elevator.floor][BUTTON_COMMAND] == 1){
-		return 1;
-	  } else if ((queue_order_belove(elevator.floor)==0) && queue[elevator.floor][BUTTON_CALL_UP]){
-			  return 1;
-		  }
-	} else if (elevator.dir ==DIRN_UP){
-	  if (elevator.queue[elevator.floor][BUTTON_CALL_UP] == 1 || elevator.queue[elevator.floor][BUTTON_COMMAND] == 1){ //test lagt til etter ||
-		return 1;
-	  } else if (elevator.floor==2 && elevator.queue[elevator.floor][BUTTON_CALL_DOWN]==1){
-			  return 1;
-		  } else if ((queue_order_above(elevator.floor)==0) && elevator.queue[elevator.floor][BUTTON_CALL_DOWN]){
-			  return 1;
+func set_queue_dir(elevator con.Elev) elevio.MotorDirection{
+    // burde ikke trengs, men ok
+	if (floor==-1 && check_queue_empty(elevator)==0){
+		return elevio.MD_Stop; //stop
+	}
+    
+	if(elevator.Floor == con.N_FLOORS-1){
+	  return elevio.MD_Down; //return down if queue is not empty and at top floor
+	}
+
+	if (elevator.Dir == elevio.MD_Up) {
+		if (queue_order_above(elevator)){
+      		return elevio.MD_Up; //Up
+    	} else if (queue_order_belove(elevator)){
+      		return elevio.MD_Down; //Down
+    	}
+  	}
+	if (elevator.Dir==elevio.MD_Down) {
+    	if (queue_order_belove(elevator)) {
+      		return elevio.MD_Down; //Down
+    	} else if (queue_order_above(elevator)){
+      		return elevio.MD_Up; //Up
+    	}
+	}
+  	if (elevator.Dir==elevio.MD_Stop){
+    	if (queue_order_above(elevator)){
+      		return elevio.MD_Up;
+    	} else if (queue_order_belove(elevator)){
+      		return elevio.MD_Down;
+    	}
+  	}
+  	return elevio.MD_Stop;
+}
+
+func queue_elev_run_stop(elevator con.Elev) bool{
+	if (elevator.Dir == elevio.MD_Down){
+	  	if (elevator.Queue[elevator.Floor][elevio.BT_HallDown] == 1 || elevator.Queue[elevator.Floor][elevio.BT_Cab] == 1){
+			return true;
+	  	} else if ((queue_order_belove(elevator)==0) && elevator.Queue[elevator.Floor][BT_HallUp]){
+			return true;
 		}
-	return 0;
+	} else if (elevator.Dir == elevio.MD_Up){
+	  	if (elevator.Queue[elevator.Floor][elevio.BT_HallUp] == 1 || elevator.Queue[elevator.Floor][elevio.BT_Cab] == 1){ //test lagt til etter ||
+			return true;
+	  	} else if (elevator.Floor==2 && elevator.Queue[elevator.Floor][elevio.BT_HallDown]==1){
+			return true;
+		} else if ((queue_order_above(elevator)==0) && elevator.Queue[elevator.Floor][elevio.BT_HallDown]){
+			return true;
+		}
+	return false;
   
-	  }
-	  return 0;
-  }
+	}
+	return false;
+}
+
+func check_queue_empty(elevator con.Elev) bool {
+	for floor := 0; floor < con.N_FLOORS; floor ++ {
+		for button = BT_HallUp; button <= elevio.BT_Cab; button++ {
+			if (elevator.Queue[floor][button]==1){ //then it is not empty
+				return false;
+			}
+		}
+	}
+	return true
+}
+
+func queue_order_at_floor(elevator con.Elev){
+	for button := BT_HallUp; button <= elevio.BT_Cab; button++ {
+		if (elevator.Queue[elevator.Floor][button]==1){ //then it is not empty
+			return true;
+		}
+	}
+}
+
+func remove_all_queue(elevator con.Elev) {
+	for floor := 0; floor < con.N_FLOORS; floor++ {
+		for button = BT_HallUp; button <= elevio.BT_Cab; button ++{
+			elevator.Queue[floor][button]==0
+			
+		}
+	}
+	for floor := 0; floor < con.N_FLOORS; floor++ {
+		for button = BT_HallUp; button <= elevio.BT_Cab; button++ {
+			if (!((floor == 0 && button == elevio.BT_HallDown) || (floor == (con.N_FLOORS-1) && button == elevio.BT_HallUp))){
+				elevio.SetButtonLamp(button, floor, 0)
+			}
+			
+		}
+	}
+	return true
+}
