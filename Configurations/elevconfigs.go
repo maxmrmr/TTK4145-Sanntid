@@ -1,5 +1,9 @@
 package Configurations
 
+import (
+	"../elevio"
+)
+
 const (
 	N_FLOORS = 4
 	N_ELEVS = 3
@@ -34,14 +38,15 @@ const (
 
 type Elev struct {
 	State ElevState
-	Dir Motor_Direction
+	Dir elevio.MotorDirection
 	Floor int
-	Done bool
+	Queue [N_FLOORS][N_BUTTONS]bool
 }
 
 type Keypress struct {
-	Button int
+	Button elevio.ButtonType
 	Floor int
+	DesignatedElev int
 }
 
 const (

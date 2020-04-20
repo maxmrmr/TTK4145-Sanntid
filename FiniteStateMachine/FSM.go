@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"time"
 
-
-//. "github.com/perkjelsvik/TTK4145-sanntid/project/config"
-
-//	hw "github.com/perkjelsvik/TTK4145-sanntid/project/hardware"
+	"../Configurations"
+	"../Hardware"
 )
 
 int curr_floor;
