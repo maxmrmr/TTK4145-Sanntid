@@ -10,7 +10,7 @@ import (
 )
 
 type NetworkChannels struct {
-	FIXME: trenger annet navn for UpdateMainLogic
+	//FIXME: trenger annet navn for UpdateMainLogic
 
 	UpdateMainLogic			chan [con.N_ElEVS]con.Elev
 	OnlineElevators 		chan [con.N_ELEVS]bool
@@ -64,7 +64,7 @@ func NetworkController(thisElevator int, channel NetworkChannels) {
 			if inMSG.ID != thisElevator && inMSG.Elevator[inMSG.ID] != msgElevator[inMSG.ID] {
 				msg.Elevator[inMSG.ID] = inMSG.Elevator[inMSG.ID]
 
-				FIXME: må finne nytt ord til UpdateMainLogic
+				// FIXME: må finne nytt ord til UpdateMainLogic
 				channel.UpdateMainLogic <- msg.Elevator
 			}
 		case broadcastMsgTicker.C:
@@ -84,7 +84,7 @@ func NetworkController(thisElevator int, channel NetworkChannels) {
 		}
 
 	case <-deleteIncomingOrderTicker.C:
-		incomingOrder = config.Keypress{Floor: -1}
+		incomingOrder = con.Keypress{Floor: -1}
 	case peerUpdate := <- channel.PeerUpdate:
 		if len(peerUpdate.Peers) == 0 {
 			for id := 0; id < con.N_ELEVS; id++ {
