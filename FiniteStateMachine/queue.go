@@ -31,7 +31,7 @@ func queueOrderAbove(elevator con.Elev) bool{
 
 func QueueSetDir(elevator con.Elev) elevio.MotorDirection{
     // burde ikke trengs, men ok
-	if (floor==-1 && QueueCheckEmptyQueue(elevator)==false){
+	if (elevator.Floor == -1 && QueueCheckEmptyQueue(elevator)==false){
 		return elevio.MD_Stop; //stop
 	}
     
@@ -108,10 +108,7 @@ func QueueRemoveAll(elevator con.Elev) {
 	for floor := 0; floor < con.N_FLOORS; floor++ {
 		for button := elevio.BT_HallUp; button <= elevio.BT_Cab; button ++{
 			elevator.Queue[floor][button] == false
-		}
-	}
-	for floor := 0; floor < con.N_FLOORS; floor++ {
-		for button := elevio.BT_HallUp; button <= elevio.BT_Cab; button++ {
+			
 			if (!((floor == 0 && button == elevio.BT_HallDown) || (floor == (con.N_FLOORS-1) && button == elevio.BT_HallUp))){
 				elevio.SetButtonLamp(button, floor, false)
 			}

@@ -6,8 +6,8 @@ import (
 )
 
 
-
-func costCalculator(thisElevator int, elevatorList[con.N_ELEVS], LocalOrder elevio.ButtonEvent, onlineElevators [con.N_ELEVS]bool) int {
+func costFunction(thisElevator int, LocalOrder elevio.ButtonEvent, elevatorList [con.N_ELEVS]con.Elev, onlineElevators [con.N_ELEVS]bool) int {
+//func costCalculator(thisElevator int, elevatorList[con.N_ELEVS], LocalOrder elevio.ButtonEvent, onlineElevators [con.N_ELEVS]bool) int {
 	if LocalOrder.Button == elevio.BT_Cab {
 		return thisElevator
 	}
