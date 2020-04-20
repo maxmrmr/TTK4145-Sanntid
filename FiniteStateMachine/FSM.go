@@ -164,7 +164,7 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 	
 func UpdateKeysPressed(NewOrder chan con.Keypress, receiveOrder chan elevio.ButtonEvent) {
 	var key con.Keypress
-	key.DesignatedElev = 1
+	key.DesignatedElevator = 1
 	for {
 		select {
 		case order := <-receiveOrder:

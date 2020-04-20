@@ -10,7 +10,8 @@ import (
 
 type NetworkChannels struct {
 
-	UpdateElevators		chan [con.N_ElEVS]con.Elev
+	//FIXME: UpdateElevators			chan [con.N_ElEVS]con.Elev
+	UpdateElevators			chan [con.N_ELEVS]con.Elev
 	OnlineElevators 		chan [con.N_ELEVS]bool
 	ExternalOrderToLocal	chan con.Keypress
 
@@ -63,7 +64,7 @@ func NetworkController(thisElevator int, ch NetworkChannels) {
 				msg.Elevator[inMSG.This] = inMSG.Elevator[inMSG.This]
 				ch.UpdateElevators <- msg.Elevator
 			}
-		case <- broadcastMsgTimer.C:
+		case <- broadcastMsgTicker.C:
 			if onlineList[thisElevator] {
 				ch.OutgoingMsg <- msg
 			}
@@ -80,7 +81,7 @@ func NetworkController(thisElevator int, ch NetworkChannels) {
 		
 
 		case <-deleteIncomingOrderTicker.C:
-			incomingOrder = config.Keypress{Floor: -1}
+			incomingOrder = con.Keypress{Floor: -1}
 		case peerUpdate := <- ch.PeerUpdate:
 			if len(peerUpdate.Peers) == 0 {
 				for current := 0; current < con.N_ELEVS; current++ {

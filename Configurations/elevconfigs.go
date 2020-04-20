@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	N_FLOORS = 4
-	N_ELEVS = 3
-	N_BUTTONS = 3
+	N_FLOORS		int = 4
+	N_ELEVS 		int = 3
+	N_BUTTONS 		int = 3
 )
 
 type Button int

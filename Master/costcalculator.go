@@ -6,8 +6,7 @@ import (
 )
 
 
-func costCalculator(thisElevator int, , elevatorList [con.N_ELEVS]con.Elev, LocalOrder elevio.ButtonEvent, onlineElevators [con.N_ELEVS]bool) int {
-//func costCalculator(thisElevator int, elevatorList[con.N_ELEVS], LocalOrder elevio.ButtonEvent, onlineElevators [con.N_ELEVS]bool) int {
+func costCalculator(thisElevator int, elevatorList [con.N_ELEVS]con.Elev, LocalOrder elevio.ButtonEvent, onlineElevators [con.N_ELEVS]bool) int {
 	if LocalOrder.Button == elevio.BT_Cab {
 		return thisElevator
 	}
@@ -17,10 +16,10 @@ func costCalculator(thisElevator int, , elevatorList [con.N_ELEVS]con.Elev, Loca
 	for elev :=0; elev < con.N_ELEVS; elev++ {
 		cost := LocalOrder.Floor - elevatorList[elev].Floor
 
-		if cost == 0 && onlineElevators[elev] && elevatorList[elev] != con.Undefined && elevatorList[elev].State != con.Moving  {
+		if cost == 0 && onlineElevators[elev] && elevatorList[elev] != con.Undefined && elevatorList[elev].State != con.RUN  {
 			return elev
 		}
-		if cost == 0 && elevatorList[elev].State == con.Moving {
+		if cost == 0 && elevatorList[elev].State == con.RUN {
 			cost += 4
 		}
 		if cost < 0 {
@@ -33,7 +32,7 @@ func costCalculator(thisElevator int, , elevatorList [con.N_ELEVS]con.Elev, Loca
 				cost += 3
 			}
 		}
-		if elevatorList[elev].State == con.DoorOpen {
+		if elevatorList[elev].State == con.DOOROPEN {
 			cost ++
 		}
 		CostList[elev] = cost
@@ -41,7 +40,7 @@ func costCalculator(thisElevator int, , elevatorList [con.N_ELEVS]con.Elev, Loca
 	maxCost := 700
 	bestElevator := -1
 	for elev :=  0; elev < con.N_ELEVS; elev++ {
-		if onlineElevators[elevator] && elevatorList[elev].State != Config.Undefined && CostList[elev] < maxCost {
+		if onlineElevators[elev] && elevatorList[elev].State != con.Undefined && CostList[elev] < maxCost {
 			bestElevator = elev
 			maxCost = CostList[elev]
 		}
