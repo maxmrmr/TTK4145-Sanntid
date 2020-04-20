@@ -13,7 +13,7 @@ import (
 
 
 
-func elevator_controller(thisElevator, SyncChannels network.NetworkChannels, localStateChannel fsm.StateChannels, elevatorcontrollers <- chan elevio.ButtonEvent, Lights chan <- [con.N_ELEVS]con.Elev) {
+func elevator_controller(thisElevator int, SyncChannels network.NetworkChannels, localStateChannel fsm.StateMachineChannels, elevatorcontrollers <- chan elevio.ButtonEvent, Lights chan <- [con.N_ELEVS]con.Elev) {
 
 	var (
 		elevatorList [con.N_ELEVS]con.Elev //Takes in the struct elev with info about alle elevators
