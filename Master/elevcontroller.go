@@ -114,7 +114,7 @@ func elevator_controller(thisElevator int, SyncChannels network.NetworkChannels,
 				elevatorList[thisElevator].Queue = tempQueue
 				go func () { localStateChannel.DeleteQueue <- elevatorList[thisElevator].Queue} ()
 				if onlineElevators[thisElevator] {
-					go func () {SyncChannels.LocalElevatorToExternal <- elvatorList }()
+					go func () {SyncChannels.LocalElevatorToExternal <- elevatorList }()
 				}
 			}
 			for id := 0; id < con.N_ELEVS; id++ {
@@ -162,7 +162,7 @@ func elevator_controller(thisElevator int, SyncChannels network.NetworkChannels,
 									elevatorList[id].Queue[floor][button] = false
 									if button != elevio.BT_Cab {
 										temp_ButtonEvent = elevio.ButtonEvent{Floor: floor, Button: button}
-										costID := costCalculator(thisElevator, temp_ButtonEvent, elevatorList, updatedOnlineElevators)
+										costID := costCalculator(thisElevator, elevatorList, temp_ButtonEvent, updatedOnlineElevators)
 										if costID == thisElevator {
 											localStateChannel.NewOrder <- temp_ButtonEvent
 										}
@@ -187,9 +187,9 @@ func LightSetter(UpdateLight chan [con.N_ELEVS]con.Elev, thisElevator int) {
 	for {
 		select {
 		case Elevator := <- UpdateLight:
-			for floor := 0; con.N_FLOORS; floor++ {
+			for floor := 0; floor  < con.N_FLOORS; floor++ {
 				for button := elevio.BT_HallUp; button <= elevio.BT_Cab; button++ {
-					for id = 0; id < con.N_ELEVS; id++ {
+					for id := 0; id < con.N_ELEVS; id++ {
 						Order[id] = false
 						if id != thisElevator && button == elevio.BT_Cab {
 							continue
