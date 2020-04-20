@@ -37,9 +37,6 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 	timerElevatorLost.Stop()
 	updateExternal := false
 
-	//update_queue();
-	//curr_floor = elev_get_floor_sensor_signal(); //gjør om til en variabel, øker lesbarhet
-	// sett lys etter hvilken etasje heisen er i
 	if (elevio.GetFloor() == -1) {
 		elevio.SetMotorDirection(elevio.MD_Down)
 	}
@@ -48,8 +45,8 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 
 
 	//stopper og gjelder uansett
-	if ( elevio.GetStop() == true) { //ville ikke fungere med elevio...
-		elevator.State = con.STOPPER;
+	if ( elevio.GetStop() == true) { 
+		elevator.State = con.STOPPER; // litt usikre på om det er slik funksjonaliteten skal være
 	}
 	for {
 		select {
@@ -57,7 +54,7 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 			elevator.Queue[newOrder.Floor][newOrder.Button] = true
 			switch (elevator.State) {
 			case con.Undefined:
-				fmt.Println("Error, elevator state for elevator running is undefines in fsm.go function\n")
+				fmt.Println("Error, elevator state for elevator running is undefines in fsm.go function")
 				updateExternal = true
 				break
 			case con.IDLE:
@@ -98,7 +95,6 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 				if (!elevio.GetStop()){
 					elevio.SetStopLamp(false)
 					elevator.State = con.Undefined
-					break;
 					if (elevio.GetFloor()==-1){
 				  		elevio.SetMotorDirection(elevator.Dir) //fortsetter å kjøre i samme retning som før stopp
 					}
