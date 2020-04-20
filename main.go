@@ -65,14 +65,14 @@ func main() {
 	go mstr.LightSetter(updateLight, thisElevator)
 	go network.NetworkController(thisElevator, networkch)
 
-	go bcast.Transmitter(msgpPort, network.OutgoingMsg)
-	go bcast.Receiver(msgpPort, network.IncomingMsg)
+	go bcast.Transmitter(msgpPort, networkch.OutgoingMsg)
+	go bcast.Receiver(msgpPort, networkch.IncomingMsg)
 
-	go bcast.Transmitter(orderPort, network.OutgoingOrder)
-	go bcast.Receiver(orderPort, network.IncomingOrder)
+	go bcast.Transmitter(orderPort, networkch.OutgoingOrder)
+	go bcast.Receiver(orderPort, networkch.IncomingOrder)
 
-	go peers.Transmitter(peersPort, thisElevatorString, network.PeersTransmitEnable)
-	go peers.Receiver(peersPort, network.PeerUpdate)
+	go peers.Transmitter(peersPort, thisElevatorString, networkch.PeersTransmitEnable)
+	go peers.Receiver(peersPort, networkch.PeerUpdate)
 
 	select {}
 }
