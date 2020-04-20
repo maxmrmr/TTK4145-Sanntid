@@ -73,8 +73,10 @@ func elevator_controller(thisElevator, SyncChannels nc.NetworkChannels, localSta
 				}
 			}
 		}
-		elevatorList[thisElevator]
+		elevatorList[thisElevator] = NewUpdateLocalElevator
+		go func() 
 	}
+
 
 }
 
