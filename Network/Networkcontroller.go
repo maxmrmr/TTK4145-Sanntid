@@ -10,7 +10,7 @@ import (
 )
 
 type NetworkChannels struct {
-	//FIXME: trenger annet navn for UpdateMainLogic
+	FIXME: trenger annet navn for UpdateMainLogic
 
 	UpdateMainLogic			chan [con.N_ElEVS]con.Elev
 	OnlineElevators 		chan [con.N_ELEVS]bool
@@ -64,7 +64,7 @@ func NetworkController(thisElevator int, channel NetworkChannels) {
 			if inMSG.ID != thisElevator && inMSG.Elevator[inMSG.ID] != msgElevator[inMSG.ID] {
 				msg.Elevator[inMSG.ID] = inMSG.Elevator[inMSG.ID]
 
-				// FIXME: må finne nytt ord til UpdateMainLogic
+				FIXME: må finne nytt ord til UpdateMainLogic
 				channel.UpdateMainLogic <- msg.Elevator
 			}
 		case broadcastMsgTicker.C:
@@ -81,28 +81,29 @@ func NetworkController(thisElevator int, channel NetworkChannels) {
 			}
 		case <-orderTicker.C:
 			channel.OutgoingOrder <- outgoingOrder
-		}
+		
 
-	case <-deleteIncomingOrderTicker.C:
-		incomingOrder = con.Keypress{Floor: -1}
-	case peerUpdate := <- channel.PeerUpdate:
-		if len(peerUpdate.Peers) == 0 {
-			for id := 0; id < con.N_ELEVS; id++ {
-				onlineList[id] = false
+		case <-deleteIncomingOrderTicker.C:
+			incomingOrder = config.Keypress{Floor: -1}
+		case peerUpdate := <- channel.PeerUpdate:
+			if len(peerUpdate.Peers) == 0 {
+				for id := 0; id < con.N_ELEVS; id++ {
+					onlineList[id] = false
+				}
 			}
-		}
-		if len(peerUpdate.New) > 0 {
-			newElev, _ := strconv.Atoi(peerUpdate.New)
-			onlineList[newElev] = true
-		}
-		if len(peerUpdate.Lost) > 0 {
-			lostElev, _ := strconv.Atoi(peerUpdate.Lost[0])
-			onlineList[lostElev] = false
-		}
-		go func() { channel.OnlineElevators <- onlineList }()
+			if len(peerUpdate.New) > 0 {
+				newElev, _ := strconv.Atoi(peerUpdate.New)
+				onlineList[newElev] = true
+			}
+			if len(peerUpdate.Lost) > 0 {
+				lostElev, _ := strconv.Atoi(peerUpdate.Lost[0])
+				onlineList[lostElev] = false
+			}
+			go func() { channel.OnlineElevators <- onlineList }()
 
-		fmt.Println("Number peers. ", len(peerUpdate.Peers))
-		fmt.Println("New peers. ", peerUpdate.New)
-		fmt.Println("Lost peers", peerUpdate.Lost)
+			fmt.Println("Number peers. ", len(peerUpdate.Peers))
+			fmt.Println("New peers. ", peerUpdate.New)
+			fmt.Println("Lost peers", peerUpdate.Lost)
+		}
 	}
 }
