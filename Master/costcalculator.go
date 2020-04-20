@@ -16,7 +16,7 @@ func costCalculator(thisElevator int, elevatorList [con.N_ELEVS]con.Elev, LocalO
 	for elev :=0; elev < con.N_ELEVS; elev++ {
 		cost := LocalOrder.Floor - elevatorList[elev].Floor
 
-		if cost == 0 && onlineElevators[elev] && elevatorList[elev] != con.Undefined && elevatorList[elev].State != con.RUN  {
+		if cost == 0 && onlineElevators[elev] && elevatorList[elev].State != con.Undefined && elevatorList[elev].State != con.RUN  {
 			return elev
 		}
 		if cost == 0 && elevatorList[elev].State == con.RUN {

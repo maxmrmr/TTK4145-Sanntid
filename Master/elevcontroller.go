@@ -39,7 +39,7 @@ func elevator_controller(thisElevator int, SyncChannels network.NetworkChannels,
 		case temp_Keypress = <- SyncChannels.ExternalOrderToLocal:
 			temp_ButtonEvent = elevio.ButtonEvent{Button: temp_Keypress.Button, Floor: temp_Keypress.Floor}
 			if elevatorList[thisElevator].State == con.Undefined {
-				costID := costCalculator(thisElevator, temp_ButtonEvent, elevatorList, onlineElevators)
+				costID := costCalculator(thisElevator, elevatorList, temp_ButtonEvent,  onlineElevators)
 				temp_Keypress.DesignatedElevator = costID
 				SyncChannels.LocalOrderToExternal <- temp_Keypress
 			} else {
@@ -71,7 +71,7 @@ func elevator_controller(thisElevator int, SyncChannels network.NetworkChannels,
 					for button := elevio.BT_HallUp; button < elevio.BT_Cab; button++ {
 						if NewUpdateLocalElevator.Queue[floor][button] {
 							temp_ButtonEvent = elevio.ButtonEvent{Floor: floor, Button: button}
-							costID := costCalculator(thisElevator, temp_ButtonEvent, elevatorList, onlineElevators)
+							costID := costCalculator(thisElevator, elevatorList, temp_ButtonEvent, onlineElevators)
 							temp_Keypress = con.Keypress{Floor: floor, Button:button, DesignatedElevator: costID}
 							SyncChannels.LocalOrderToExternal <- temp_Keypress
 						}
@@ -79,9 +79,9 @@ func elevator_controller(thisElevator int, SyncChannels network.NetworkChannels,
 				}
 			}
 			elevatorList[thisElevator] = NewUpdateLocalElevator
-			go func() { UpdateLight <- elevatorList }()
+			go func() { Lights <- elevatorList }()
 			if onlineElevators[thisElevator] {
-				go func() { SyncChannels.LocalElevatorToExternal <- elevatorList}
+				go func() { SyncChannels.LocalElevatorToExternal <- elevatorList}()
 			}
 		case tempElevatorArray := <-SyncChannels.UpdateMainLogic:
 			change := false
@@ -113,7 +113,7 @@ func elevator_controller(thisElevator int, SyncChannels network.NetworkChannels,
 			if tempQueue != elevatorList[thisElevator].Queue {
 				elevatorList[thisElevator].Queue = tempQueue
 				go func () { localStateChannel.DeleteQueue <- elevatorList[thisElevator].Queue} ()
-				if OnlineList[thisElevator] {
+				if onlineElevators[thisElevator] {
 					go func () {SyncChannels.LocalElevatorToExternal <- elvatorList }()
 				}
 			}
