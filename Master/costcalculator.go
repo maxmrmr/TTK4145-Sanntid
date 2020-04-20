@@ -20,7 +20,7 @@ func costFunction(thisElevator int, LocalOrder elevio.ButtonEvent, elevatorList 
 		if cost == 0 && onlineElevators[elev] && elevatorList[elev] != con.Undefined && elevatorList[elev].State != con.Moving  {
 			return elev
 		}
-		if cost == 0 && elevatorList[elev].State == config.Moving {
+		if cost == 0 && elevatorList[elev].State == con.Moving {
 			cost += 4
 		}
 		if cost < 0 {
@@ -41,7 +41,7 @@ func costFunction(thisElevator int, LocalOrder elevio.ButtonEvent, elevatorList 
 	maxCost := 700
 	bestElevator := -1
 	for elev :=  0; elev < con.N_ELEVS; elev++ {
-		if onlineElevators[elevtor] && elevatorList[elev].State != Config.Undefined && CostList[elev] < maxCost {
+		if onlineElevators[elevator] && elevatorList[elev].State != Config.Undefined && CostList[elev] < maxCost {
 			bestElevator = elev
 			maxCost = CostList[elev]
 		}
