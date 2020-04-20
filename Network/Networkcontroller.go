@@ -3,8 +3,7 @@ package NetworkController
 import (
 	"fmt"
 	"strconv"
-	"time"
-
+	t "time"
 	con "../Configurations"
 	peers "../Network/peers"
 )
@@ -38,10 +37,10 @@ func NetworkController(thisElevator int, ch NetworkChannels) {
 		incomingOrder		con.Keypress
 	)
 
-	PrimaryOrderTimer := time.NewTicker(100 * time.Millisecond)
-	orderTicker := time.Newticker(10 * time.Millisecond)
-	broadcastMsgTicker := time.Newticker(40 * time.Millisecond)
-	deleteIncomingOrderTicker := time.NewTicker(1 * time.Second)
+	PrimaryOrderTimer := t.NewTicker(100 * t.Millisecond)
+	orderTicker := t.Newticker(10 * t.Millisecond)
+	broadcastMsgTicker := t.Newticker(40 * t.Millisecond)
+	deleteIncomingOrderTicker := t.NewTicker(1 * t.Second)
 	orderTicker.Stop()
 
 	msg.This = thisElevator
@@ -70,11 +69,11 @@ func NetworkController(thisElevator int, ch NetworkChannels) {
 			if onlineList[thisElevator] {
 				ch.OutgoingMsg <- msg
 			}
-		case <-PrimaryOrderTimer.C:
+		case <-PrimaryOrdertr.C:
 			if len(queue) > 0 {
 				outgoingOrder = queue[0]
 				queue = queue[1:]
-				orderTicker = time.NewTicker(10 * time.Millisecond)
+				orderTicker = t.NewTicker(10 * t.Millisecond)
 			} else {
 				orderTicker.Stop()
 			}
