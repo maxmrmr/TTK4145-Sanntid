@@ -60,7 +60,7 @@ func NetworkController(thisElevator int, ch NetworkChannels) {
 				ch.ExternalOrderToLocal
 			}
 		case inMSG := <-ch.IncomingMsg:
-			if inMSG.This != thisElevator && inMSG.Elevator[inMSG.This] != msgElevator[inMSG.This] {
+			if inMSG.This != thisElevator && inMSG.Elevator[inMSG.This] != msg.Elevator[inMSG.This] {
 				msg.Elevator[inMSG.This] = inMSG.Elevator[inMSG.This]
 
 			
