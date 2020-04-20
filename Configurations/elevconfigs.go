@@ -1,7 +1,7 @@
 package Configurations
 
-import (
-	"../elevio"
+import ( 
+	elevio "../Hardware"
 )
 
 const (
@@ -29,7 +29,7 @@ const (
 type ElevState int
 
 const (
-	INIT ElevState = iota - 1 // undefined = -1 should be in INIT
+	Undefined ElevState = iota - 1 // undefined = -1 should be in INIT
 	IDLE
 	RUN
 	STOPPER
