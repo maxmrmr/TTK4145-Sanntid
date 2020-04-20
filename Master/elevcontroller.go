@@ -32,7 +32,7 @@ func elevator_controller(thisElevator int, SyncChannels network.NetworkChannels,
 				if id == thisElevator {
 					localStateChannel.NewOrder <- newLocalOrder
 				} else {
-					temp_Keypress = con.Keypress{DesignatedElevtor: id, Floor: newLocalOrder.Floor, Button: newLocalOrder.Button}
+					temp_Keypress = con.Keypress{DesignatedElevator: id, Floor: newLocalOrder.Floor, Button: newLocalOrder.Button}
 					SyncChannels.LocalOrderToExternal <- temp_Keypress
 				}
 			}
@@ -40,7 +40,7 @@ func elevator_controller(thisElevator int, SyncChannels network.NetworkChannels,
 			temp_ButtonEvent = elevio.ButtonEvent{Button: temp_Keypress.Button, Floor: temp_Keypress.Floor}
 			if elevatorList[thisElevator].State == con.Undefined {
 				costID := costCalculator(thisElevator, temp_ButtonEvent, elevatorList, onlineElevators)
-				temp_Keypress.DesignatedElevtor = costID
+				temp_Keypress.DesignatedElevator = costID
 				SyncChannels.LocalOrderToExternal <- temp_Keypress
 			} else {
 				localStateChannel.NewOrder <- temp_ButtonEvent
