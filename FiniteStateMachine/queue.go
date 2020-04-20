@@ -107,7 +107,7 @@ func QueueOrderAtFloor(elevator con.Elev) bool {
 func QueueRemoveAll(elevator con.Elev) {
 	for floor := 0; floor < con.N_FLOORS; floor++ {
 		for button := elevio.BT_HallUp; button <= elevio.BT_Cab; button ++{
-			elevator.Queue[floor][button] == false
+			elevator.Queue[floor][button] = false
 
 			if (!((floor == 0 && button == elevio.BT_HallDown) || (floor == (con.N_FLOORS-1) && button == elevio.BT_HallUp))){
 				elevio.SetButtonLamp(button, floor, false)
