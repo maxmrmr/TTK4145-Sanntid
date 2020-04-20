@@ -7,6 +7,7 @@ import (
 	con "./Configurations"
 	fsm "./FiniteStateMachine"
 	mstr "./Master"
+	network "./Network"
 	bcast "./Network/bcast"
 	peers "./Network/peers"
 	elevio "./Hardware"
@@ -16,25 +17,25 @@ func main() {
 
 	thisElevatorString := os.Args[1]
 	localhost := "localhost:" + os.Args[2]
-	thisElevator, _ := strconv.Atoi(LocalIDString)
+	thisElevator, _ := strconv.Atoi(thisElevatorString)
 
-	elevio.Init(localhost, con.NumFloor)
-	channels := fsm.StateChannels{
+	elevio.Init(localhost, con.N_FLOORS)
+	channels := fsm.StateMachineChannels{
 		Elevator:       make(chan con.Elev),
 		NewOrder:       make(chan elevio.ButtonEvent, 100),
 		ArrivedAtFloor: make(chan int),
-		DeleteQueue:    make(chan [con.NumFloor][con.NumButtons]bool),
+		DeleteQueue:    make(chan [con.N_FLOORS][con.N_BUTTONS]bool),
 	}
 
-	network := nc.NetworkChannels{
+	network := network.NetworkChannels{
 		//from network to elevator controller
-		UpdateMainLogic:      make(chan [con.NumElevator]con.Elev, 100),
-		OnlineElevators:      make(chan [con.NumElevator]bool),
+		UpdateMainLogic:      make(chan [con.N_ELEVS]con.Elev, 100),
+		OnlineElevators:      make(chan [con.N_ELEVS]bool),
 		ExternalOrderToLocal: make(chan con.Keypress),
 
 		//from elevator to network controller
 		LocalOrderToExternal:    make(chan con.Keypress),
-		LocalElevatorToExternal: make(chan [con.NumElevator]conf.Elev),
+		LocalElevatorToExternal: make(chan [con.N_ELEVS]con.Elev),
 
 		//network controller to network
 		OutgoingMsg:         make(chan con.Message),
@@ -49,7 +50,7 @@ func main() {
 
 	var (
 		newOrder    = make(chan elevio.ButtonEvent)
-		updateLight = make(chan [config.NumElevator]con.Elev)
+		updateLight = make(chan [con.N_ELEVS]con.Elev)
 	)
 
 	msgpPort := 42000
@@ -59,8 +60,8 @@ func main() {
 	go elevio.PollButtons(newOrder)
 	go elevio.PollFloorSensor(channels.ArrivedAtFloor)
 
-	go fsm.RunElevator(channels, thisElevator)
-	go mstr.MainLogicFunction(thisElevator, newOrder, updateLight, channels, network)
+	go fsm.RunFSM(channels, thisElevator)
+	go mstr.ElevatorController(thisElevator, newOrder, updateLight, channels, network)
 	go mstr.LightSetter(updateLight, thisElevator)
 	go network.NetworkController(thisElevator, network)
 

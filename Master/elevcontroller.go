@@ -13,7 +13,7 @@ import (
 
 
 
-func elevator_controller(thisElevator int, SyncChannels network.NetworkChannels, localStateChannel fsm.StateMachineChannels, elevatorcontrollers <- chan elevio.ButtonEvent, Lights chan <- [con.N_ELEVS]con.Elev) {
+func ElevatorController(thisElevator int, SyncChannels network.NetworkChannels, localStateChannel fsm.StateMachineChannels, elevatorcontrollers <- chan elevio.ButtonEvent, Lights chan <- [con.N_ELEVS]con.Elev) {
 
 	var (
 		elevatorList [con.N_ELEVS]con.Elev //Takes in the struct elev with info about alle elevators
@@ -90,7 +90,7 @@ func elevator_controller(thisElevator int, SyncChannels network.NetworkChannels,
 				if id != thisElevator {
 					for floor := 0; floor < con.N_FLOORS; floor++ {
 						for button := elevio.BT_HallUp; button <= elevio.BT_Cab; button++ {
-							if elevatorList[thisElevator].Queue[floor][button] && !NewUpdateLocalElevator.Queue[floor][button] {
+							if elevatorList[thisElevator].Queue[floor][button] && !tempElevatorArray[id].Queue[floor][button] {
 								change = true
 							}
 						}
