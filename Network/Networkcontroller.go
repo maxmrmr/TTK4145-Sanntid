@@ -38,8 +38,8 @@ func NetworkController(thisElevator int, ch NetworkChannels) {
 	)
 
 	PrimaryOrderTimer := t.NewTicker(100 * t.Millisecond)
-	orderTicker := t.Newticker(10 * t.Millisecond)
-	broadcastMsgTicker := t.Newticker(40 * t.Millisecond)
+	orderTicker := t.NewTicker(10 * t.Millisecond)
+	broadcastMsgTicker := t.NewTicker(40 * t.Millisecond)
 	deleteIncomingOrderTicker := t.NewTicker(1 * t.Second)
 	orderTicker.Stop()
 
