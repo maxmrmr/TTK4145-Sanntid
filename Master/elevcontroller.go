@@ -83,7 +83,7 @@ func elevator_controller(thisElevator int, SyncChannels network.NetworkChannels,
 			if onlineElevators[thisElevator] {
 				go func() { SyncChannels.LocalElevatorToExternal <- elevatorList}()
 			}
-		case tempElevatorArray := <-SyncChannels.UpdateMainLogic:
+		case tempElevatorArray := <-SyncChannels.UpdateElevators:
 			change := false
 			tempQueue := elevatorList[thisElevator].Queue
 			for id := 0; id < con.N_ELEVS; id++ {
@@ -123,8 +123,8 @@ func elevator_controller(thisElevator int, SyncChannels network.NetworkChannels,
 				}
 				elevatorList[id] = tempElevatorArray[id]
 			}
-			go func() { UpdateLight <- elevatorList }() 
-		case updatedOnlineElevators := <- SyncChannels.onlineElevators:
+			go func() { Lights <- elevatorList }() 
+		case updatedOnlineElevators := <- SyncChannels.OnlineElevators:
 			change := false
 			N_ELEVS_ONLINE := 0
 
@@ -176,7 +176,7 @@ func elevator_controller(thisElevator int, SyncChannels network.NetworkChannels,
 			if change {
 				go func() { SyncChannels.LocalElevatorToExternal <- elevatorList }()
 			}
-			go func() { UpdateLight <- elevatorList }()
+			go func() { Lights <- elevatorList }()
 			onlineElevators = updatedOnlineElevators
 		}
 	}
