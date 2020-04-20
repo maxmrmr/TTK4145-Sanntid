@@ -9,7 +9,7 @@ import (
 	mstr "./Master"
 	bcast "./Network/bcast"
 	peers "./Network/peers"
-	"./elevio"
+	elevio "./Hardware"
 )
 
 func main() {

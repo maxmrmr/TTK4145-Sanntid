@@ -2,7 +2,7 @@ package Master
 
 import ( 
 	con "../Configurations"
-	"../elevio"
+	elevio "../Hardware"
 )
 
 

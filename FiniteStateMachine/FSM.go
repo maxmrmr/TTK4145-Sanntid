@@ -26,21 +26,21 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 	elevator := con.Elev{
 		State: con.IDLE, 
 		Dir: elevio.MD_Stop,
-		Floor: elevio.getFloor(),
+		Floor: elevio.GetFloor(),
 	}
 	
 	// Need a timer to check if order is completed
-	timer_DoorOpen := t.NewTimer(3 * t.Second)
-	timer_ElevatorLost := t.NewTimer(3 * t.Second)
+	timerDoorOpen := t.NewTimer(3 * t.Second)
+	timerElevatorLost := t.NewTimer(3 * t.Second)
 
-	timer_DoorOpen.Stop()
-	timer_ElevatorLost.Stop()
+	timerDoorOpen.Stop()
+	timerElevatorLost.Stop()
 	updateExternal := false
 
 	//update_queue();
 	//curr_floor = elev_get_floor_sensor_signal(); //gjør om til en variabel, øker lesbarhet
 	// sett lys etter hvilken etasje heisen er i
-	if (elevio.getFloor() == -1) {
+	if (elevio.GetFloor() == -1) {
 		elevio.SetMotorDirection(elevio.MD_Down)
 	}
 	elevio.SetMotorDirection(elevio.MD_Stop)
@@ -48,7 +48,7 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 
 
 	//stopper og gjelder uansett
-	if ( elevio.getStop() == 1) { //ville ikke fungere med elevio...
+	if ( elevio.GetStop() == true) { //ville ikke fungere med elevio...
 		elevator.State = con.STOPPER;
 	}
 	for {
@@ -61,16 +61,16 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 				updateExternal = true
 				break
 			case con.IDLE:
-				elevator.Dir = set_queue_dir(elevator)
+				elevator.Dir = QueueSetDir(elevator)
 				elevio.SetMotorDirection(elevator.Dir)
 				if elevator.Dir == elevio.MD_Stop {
 					elevator.State = con.DOOROPEN
 					elevio.SetDoorOpenLamp(true)
-					timer_DoorOpen.Reset(3* t.Second)
+					timerDoorOpen.Reset(3* t.Second)
 					elevator.Queue[elevator.Floor] = [con.N_BUTTONS]bool{false} //removing order from queue
 				} else {
 					elevator.State = con.RUN
-					timer_ElevatorLost.Reset( 3* t.Second)
+					timerElevatorLost.Reset( 3* t.Second)
 				}
 				updateExternal = true
 
@@ -83,26 +83,26 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 				elevio.SetStopLamp(true)
 				//int dirn = elev_get_motor_directcheck_queue_empty()==0){ion(); //setter dir til den retningen vi kjørte i før stop ble trykekt
 				elevio.SetMotorDirection(elevio.MD_Stop)
-				remove_all_queue(elevator)
+				QueueRemoveAll(elevator)
 	
 	
-				if ((elevio.getFloor() !=-1) && elevio.getStop()) {
-			  		for ((elevio.getFloor() != -1 ) && elevio.getStop()) {
-						elevio.SetDoorOpenLamp(1)
+				if ((elevio.GetFloor() !=-1) && elevio.GetStop()) {
+			  		for ((elevio.GetFloor() != -1 ) && elevio.GetStop()) {
+						elevio.SetDoorOpenLamp(true)
 			  		}
 			  	elevator.State = con.DOOROPEN
-			  	elevio.SetStopLamp(0)
+			  	elevio.SetStopLamp(false)
 			  	break
 			  	}
 	
 				if (!elevio.GetStop()){
-					elevio.SetStopLamp(0)
-					elevator.state=con.Undefined
+					elevio.SetStopLamp(false)
+					elevator.State = con.Undefined
 					break;
 					if (elevio.GetFloor()==-1){
 				  		elevio.SetMotorDirection(elevator.Dir) //fortsetter å kjøre i samme retning som før stopp
 					}
-					elevator.state = con.DOOROPEN
+					elevator.State = con.DOOROPEN
 				 	break
 			  	}	
 				break
@@ -110,9 +110,9 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 		  	case con.DOOROPEN: //door open
 	
 				elevio.SetMotorDirection(elevio.MD_Stop)
-				elevio.SetDoorOpenLamp(1)
+				elevio.SetDoorOpenLamp(true)
 				if elevator.Floor == newOrder.Floor {
-					timer_DoorOpen.Reset(3 * t.Second)
+					timerDoorOpen.Reset(3 * t.Second)
 					elevator.Queue[elevator.Floor] = [con.N_BUTTONS]bool{false}	
 				} else {
 					updateExternal = true
@@ -123,38 +123,39 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 			elevator.Queue = DeleteQueue
 		case elevator.Floor = <- ch.ArrivedAtFloor:
 			elevio.SetFloorIndicator(elevator.Floor)
-			if queue_elev_run_stop(elevator) {
-				timer_ElevatorLost.Stop()
+			if QueueElevRunStop(elevator) {
+				timerElevatorLost.Stop()
 				elevio.SetMotorDirection(elevio.MD_Stop)
-				if !orderAtFloor(elevator) {
+				if !QueueOrderAtFloor(elevator) {
 					elevator.State = con.IDLE
-					timer_DoorOpen.Reset(3 * t.Second)
+					timerDoorOpen.Reset(3 * t.Second)
 				} else {
 					elevio.SetDoorOpenLamp(true)
 					elevator.State = con.DOOROPEN
-					DoorTimer.Reset(3 * t.Second)
+					//FIXME: Det stod: DoorTimer.Reset(3 * t.Second). Endret til det som står under. Ok?
+					timerDoorOpen.Reset(3 * t.Second)
 					elevator.Queue[elevator.Floor] = [con.N_BUTTONS]bool{false}
 				}
 			} else if elevator.State == con.RUN {
-				timer_ElevatorLost.Reset(3*t.Second)
+				timerElevatorLost.Reset(3*t.Second)
 			}
 			updateExternal = true
-		case <- timer_DoorOpen.C: //if dooropen is timed out, order is done
+		case <- timerDoorOpen.C: //if dooropen is timed out, order is done
 			elevio.SetDoorOpenLamp(false)
-			elevator.Dir = set_queue_dir(elevator)
+			elevator.Dir = QueueSetDir(elevator)
 			if elevator.Dir == elevio.MD_Stop {
 				elevator.State = con.IDLE
-				timer_ElevatorLost.Stop()
+				timerElevatorLost.Stop()
 			} else {
 				elevator.State = con.RUN
-				timer_ElevatorLost.Reset(3*t.Second)
+				timerElevatorLost.Reset(3*t.Second)
 				elevio.SetMotorDirection(elevator.Dir)
 			}
 			updateExternal = true
-		case <- timer_ElevatorLost.C:
+		case <- timerElevatorLost.C:
 			elevator.State = con.Undefined
 			fmt.Println("Elevator connection is lost")
-			timer_ElevatorLost.Reset(5 * t.Second)
+			timerElevatorLost.Reset(5 * t.Second)
 			updateExternal = true
 		 }
 		 if updateExternal {
@@ -166,8 +167,8 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 
 	
 func UpdateKeysPressed(NewOrder chan con.Keypress, receiveOrder chan elevio.ButtonEvent) {
-	var key config.Keypress
-	key.DesignatedElevator = 1
+	var key con.Keypress
+	key.DesignatedElev = 1
 	for {
 		select {
 		case order := <-receiveOrder:
