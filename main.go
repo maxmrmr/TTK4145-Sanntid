@@ -7,7 +7,7 @@ import (
 	con "./Configurations"
 	fsm "./FiniteStateMachine"
 	mstr "./Master"
-	network "./Network"
+	network "./Network/Networkcontroller"
 	bcast "./Network/bcast"
 	peers "./Network/peers"
 	elevio "./Hardware"

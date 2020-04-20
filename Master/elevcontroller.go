@@ -5,7 +5,7 @@ import (
 
 	elevio "../Hardware"
 	con "../Configurations"
-	network "../Network"
+	network "../Network/Networkcontroller"
 	fsm "../FiniteStateMachine"
 )
 

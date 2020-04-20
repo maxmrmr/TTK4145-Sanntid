@@ -1,16 +1,15 @@
-package NetworkController
+package Network
 
 import (
 	"fmt"
 	"strconv"
 	t "time"
-	con "../Configurations"
-	peers "../Network/peers"
+	con "../../Configurations"
+	peers "../../Network/peers"
 )
 
 type NetworkChannels struct {
 
-	//FIXME: UpdateElevators			chan [con.N_ElEVS]con.Elev
 	UpdateElevators			chan [con.N_ELEVS]con.Elev
 	OnlineElevators 		chan [con.N_ELEVS]bool
 	ExternalOrderToLocal	chan con.Keypress
