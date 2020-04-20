@@ -10,9 +10,8 @@ import (
 )
 
 type NetworkChannels struct {
-	//FIXME: trenger annet navn for UpdateMainLogic
 
-	UpdateMainLogic			chan [con.N_ElEVS]con.Elev
+	UpdateElevators		chan [con.N_ElEVS]con.Elev
 	OnlineElevators 		chan [con.N_ELEVS]bool
 	ExternalOrderToLocal	chan con.Keypress
 
@@ -31,7 +30,7 @@ type NetworkChannels struct {
 }
 
 
-func NetworkController(thisElevator int, channel NetworkChannels) {
+func NetworkController(thisElevator int, ch NetworkChannels) {
 	var (
 		msg 				con.Message
 		onlineList			[con.N_ELEVS]bool
@@ -46,30 +45,30 @@ func NetworkController(thisElevator int, channel NetworkChannels) {
 	orderTicker.Stop()
 
 	msg.ID = thisElevator
-	channel.PeersTransmitEnable <- true
+	ch.PeersTransmitEnable <- true
 	queue := make([]con.Keypress, 0)
 
 	for {
 		select {
-		case msg.Elevator = <-channel.LocalElevatorToExternal:
-		case ExternalOrder := <-channel.LocalOrderToExternal:
+		case msg.Elevator = <-ch.LocalElevatorToExternal:
+		case ExternalOrder := <-ch.LocalOrderToExternal:
 			queue = append(queue, ExternalOrder)
 
-		case inOrder := <- channel.IncomingOrder:
+		case inOrder := <- ch.IncomingOrder:
 			if inOrder.DesignatedElevator == thisElevator && incomingOrder != inOrder {
 				incomingOrder = inOrder
-				channel.ExternalOrderToLocal
+				ch.ExternalOrderToLocal
 			}
-		case inMSG := <-channel.IncomingMsg:
+		case inMSG := <-ch.IncomingMsg:
 			if inMSG.ID != thisElevator && inMSG.Elevator[inMSG.ID] != msgElevator[inMSG.ID] {
 				msg.Elevator[inMSG.ID] = inMSG.Elevator[inMSG.ID]
 
-				FIXME: må finne nytt ord til UpdateMainLogic
-				channel.UpdateMainLogic <- msg.Elevator
+			
+				ch.UpdateElevators <- msg.Elevator
 			}
 		case broadcastMsgTicker.C:
 			if onlineList[thisElevator] {
-				channel.OutgoingMsg <- msg
+				ch.OutgoingMsg <- msg
 			}
 		case <-PrimaryOrderTimer.C:
 			if len(queue) > 0 {
@@ -80,12 +79,12 @@ func NetworkController(thisElevator int, channel NetworkChannels) {
 				orderTicker.Stop()
 			}
 		case <-orderTicker.C:
-			channel.OutgoingOrder <- outgoingOrder
+			ch.OutgoingOrder <- outgoingOrder
 		
 
 		case <-deleteIncomingOrderTicker.C:
 			incomingOrder = config.Keypress{Floor: -1}
-		case peerUpdate := <- channel.PeerUpdate:
+		case peerUpdate := <- ch.PeerUpdate:
 			if len(peerUpdate.Peers) == 0 {
 				for id := 0; id < con.N_ELEVS; id++ {
 					onlineList[id] = false
@@ -99,7 +98,7 @@ func NetworkController(thisElevator int, channel NetworkChannels) {
 				lostElev, _ := strconv.Atoi(peerUpdate.Lost[0])
 				onlineList[lostElev] = false
 			}
-			go func() { channel.OnlineElevators <- onlineList }()
+			go func() { ch.OnlineElevators <- onlineList }()
 
 			fmt.Println("Number peers. ", len(peerUpdate.Peers))
 			fmt.Println("New peers. ", peerUpdate.New)

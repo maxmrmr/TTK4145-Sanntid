@@ -5,7 +5,6 @@ import (
 	"net"
 	"sort"
 	"time"
-
 	"../conn"
 )
 
