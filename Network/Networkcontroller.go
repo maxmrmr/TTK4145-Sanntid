@@ -44,7 +44,7 @@ func NetworkController(thisElevator int, ch NetworkChannels) {
 	deleteIncomingOrderTicker := time.NewTicker(1 * time.Second)
 	orderTicker.Stop()
 
-	msg.ID = thisElevator
+	msg.This = thisElevator
 	ch.PeersTransmitEnable <- true
 	queue := make([]con.Keypress, 0)
 
@@ -60,8 +60,8 @@ func NetworkController(thisElevator int, ch NetworkChannels) {
 				ch.ExternalOrderToLocal
 			}
 		case inMSG := <-ch.IncomingMsg:
-			if inMSG.ID != thisElevator && inMSG.Elevator[inMSG.ID] != msgElevator[inMSG.ID] {
-				msg.Elevator[inMSG.ID] = inMSG.Elevator[inMSG.ID]
+			if inMSG.This != thisElevator && inMSG.Elevator[inMSG.This] != msgElevator[inMSG.This] {
+				msg.Elevator[inMSG.This] = inMSG.Elevator[inMSG.This]
 
 			
 				ch.UpdateElevators <- msg.Elevator
@@ -86,8 +86,8 @@ func NetworkController(thisElevator int, ch NetworkChannels) {
 			incomingOrder = config.Keypress{Floor: -1}
 		case peerUpdate := <- ch.PeerUpdate:
 			if len(peerUpdate.Peers) == 0 {
-				for id := 0; id < con.N_ELEVS; id++ {
-					onlineList[id] = false
+				for current := 0; current < con.N_ELEVS; current++ {
+					onlineList[current] = false
 				}
 			}
 			if len(peerUpdate.New) > 0 {
