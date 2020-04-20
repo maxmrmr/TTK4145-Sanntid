@@ -40,7 +40,10 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 	if (elevio.GetFloor() == -1) {
 		elevio.SetMotorDirection(elevio.MD_Down)
 	}
-	elevio.SetMotorDirection(elevio.MD_Stop)
+	for (elevio.GetFloor() == -1) {
+		t.Sleep(10  * t.Millisecond)
+	}
+	elevio.SetMotorDirection(elevio.MD_Stop) 
 	//readFromFile("elevOrders", thisElevator, &elevator)
 
 
