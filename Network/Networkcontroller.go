@@ -56,20 +56,18 @@ func NetworkController(thisElevator int, ch NetworkChannels) {
 		case inOrder := <- ch.IncomingOrder:
 			if inOrder.DesignatedElevator == thisElevator && incomingOrder != inOrder {
 				incomingOrder = inOrder
-				ch.ExternalOrderToLocal
+				ch.ExternalOrderToLocal <- inOrder
 			}
 		case inMSG := <-ch.IncomingMsg:
 			if inMSG.This != thisElevator && inMSG.Elevator[inMSG.This] != msg.Elevator[inMSG.This] {
 				msg.Elevator[inMSG.This] = inMSG.Elevator[inMSG.This]
-
-			
 				ch.UpdateElevators <- msg.Elevator
 			}
-		case broadcastMsgTicker.C:
+		case <- broadcastMsgTimer.C:
 			if onlineList[thisElevator] {
 				ch.OutgoingMsg <- msg
 			}
-		case <-PrimaryOrdertr.C:
+		case <- PrimaryOrderTimer.C:
 			if len(queue) > 0 {
 				outgoingOrder = queue[0]
 				queue = queue[1:]
