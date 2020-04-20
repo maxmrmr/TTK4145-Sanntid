@@ -27,9 +27,9 @@ func main() {
 		DeleteQueue:    make(chan [con.N_FLOORS][con.N_BUTTONS]bool),
 	}
 
-	network := network.NetworkChannels{
+	networkch := network.NetworkChannels{
 		//from network to elevator controller
-		UpdateMainLogic:      make(chan [con.N_ELEVS]con.Elev, 100),
+		UpdateElevators:      make(chan [con.N_ELEVS]con.Elev, 100),
 		OnlineElevators:      make(chan [con.N_ELEVS]bool),
 		ExternalOrderToLocal: make(chan con.Keypress),
 
@@ -61,9 +61,9 @@ func main() {
 	go elevio.PollFloorSensor(channels.ArrivedAtFloor)
 
 	go fsm.RunFSM(channels, thisElevator)
-	go mstr.ElevatorController(thisElevator, newOrder, updateLight, channels, network)
+	go mstr.ElevatorController(thisElevator, networkch, channels, newOrder, updateLight)
 	go mstr.LightSetter(updateLight, thisElevator)
-	go network.NetworkController(thisElevator, network)
+	go network.NetworkController(thisElevator, networkch)
 
 	go bcast.Transmitter(msgpPort, network.OutgoingMsg)
 	go bcast.Receiver(msgpPort, network.IncomingMsg)
