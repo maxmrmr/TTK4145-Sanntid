@@ -10,7 +10,7 @@ import (
 )
 
 type NetworkChannels struct {
-	FIXME: trenger annet navn for UpdateMainLogic
+	//FIXME: trenger annet navn for UpdateMainLogic
 
 	UpdateMainLogic			chan [con.N_ElEVS]con.Elev
 	OnlineElevators 		chan [con.N_ELEVS]bool
