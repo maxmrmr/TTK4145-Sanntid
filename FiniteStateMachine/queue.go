@@ -35,9 +35,6 @@ func QueueSetDir(elevator con.Elev) elevio.MotorDirection{
 		return elevio.MD_Stop; //stop
 	}
     
-	if(elevator.Floor == con.N_FLOORS-1){
-	  return elevio.MD_Down; //return down if queue is not empty and at top floor
-	}
 
 	if (elevator.Dir == elevio.MD_Up) {
 		if (queueOrderAbove(elevator)){
