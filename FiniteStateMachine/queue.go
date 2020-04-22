@@ -94,7 +94,7 @@ func QueueCheckEmptyQueue(elevator con.Elev) bool {
 
 func QueueOrderAtFloor(elevator con.Elev) bool {
 	for button := elevio.BT_HallUp; button <= elevio.BT_Cab; button++ {
-		if elevator.Queue[elevator.Floor][button] == true { //then it is not empty
+		if elevator.Queue[elevator.Floor][button] == true { //then it is at right floor
 			return true
 		}
 	}

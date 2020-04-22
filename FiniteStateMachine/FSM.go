@@ -29,7 +29,7 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 		Floor: elevio.GetFloor(),
 	}
 	
-	// Need a timer to check if order is completed
+	// Timer to check if order is completed
 	timerDoorOpen := t.NewTimer(3 * t.Second)
 	timerElevatorLost := t.NewTimer(3 * t.Second)
 
@@ -44,8 +44,7 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 		t.Sleep(10  * t.Millisecond)
 	}
 	elevio.SetMotorDirection(elevio.MD_Stop) 
-	//readFromFile("elevOrders", thisElevator, &elevator)
-
+	
 
 	//stopper og gjelder uansett
 	if ( elevio.GetStop() == true) { 
@@ -81,7 +80,6 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 		  	case con.STOPPER:
 				//queue cleares, heisen stopper
 				elevio.SetStopLamp(true)
-				//int dirn = elev_get_motor_directcheck_queue_empty()==0){ion(); //setter dir til den retningen vi kjørte i før stop ble trykekt
 				elevio.SetMotorDirection(elevio.MD_Stop)
 				QueueRemoveAll(elevator)
 	
@@ -131,7 +129,6 @@ func RunFSM(ch StateMachineChannels, thisElevator  int){
 				} else {
 					elevio.SetDoorOpenLamp(true)
 					elevator.State = con.DOOROPEN
-					//FIXME: Det stod: DoorTimer.Reset(3 * t.Second). Endret til det som står under. Ok?
 					timerDoorOpen.Reset(3 * t.Second)
 					elevator.Queue[elevator.Floor] = [con.N_BUTTONS]bool{false}
 				}
