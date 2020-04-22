@@ -58,8 +58,8 @@ func ElevatorController(thisElevator int, SyncChannels network.NetworkChannels, 
 					change = false
 					for id := 0; id < con.N_ELEVS; id++ {
 						if id != thisElevator {
-							elevatorList[thisElevator].Queue[floor][elevio.BT_HallUp] = false
-							elevatorList[thisElevator].Queue[floor][elevio.BT_HallDown] = false
+							elevatorList[thisElevator].Queue[floor][elevio.BT_HallUp] = false //bestilling fjernes fra køen
+							elevatorList[thisElevator].Queue[floor][elevio.BT_HallDown] = false //bestilling fjernees fra køen
 						}
 					}
 				}
