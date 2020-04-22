@@ -19,7 +19,7 @@ func queueOrderBelow(elevator con.Elev) bool {
 }
 
 func queueOrderAbove(elevator con.Elev) bool{
-	for floor := elevator.Floor; floor < con.N_FLOORS; floor ++ {
+	for floor := (elevator.Floor + 1); floor < con.N_FLOORS; floor ++ {
 	  	for button := elevio.BT_HallUp; button<=elevio.BT_Cab; button++ {
 			if(elevator.Queue[floor][button] == true){
 		  		return true;
@@ -69,8 +69,6 @@ func QueueElevRunStop(elevator con.Elev) bool{
 		}
 	} else if (elevator.Dir == elevio.MD_Up){
 	  	if (elevator.Queue[elevator.Floor][elevio.BT_HallUp] == true || elevator.Queue[elevator.Floor][elevio.BT_Cab] == true){ //test lagt til etter ||
-			return true;
-	  	} else if (elevator.Floor==2 && elevator.Queue[elevator.Floor][elevio.BT_HallDown] == true){
 			return true;
 		} else if ((queueOrderAbove(elevator)== false) && elevator.Queue[elevator.Floor][elevio.BT_HallDown]){
 			return true;
